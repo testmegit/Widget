@@ -9,24 +9,22 @@ Carmen.Display = function(scope) {
   // Color coding, e.g. negative values in red or values > 100 km/h in blue ...
   // Text Size
 
-
   this.datasource = null;
 
   this.bind();
-
-  this.option = function() {
-    // that.option();
-    var WidgetGeneric = Object.getPrototypeOf(Object.getPrototypeOf(this));
-    WidgetGeneric.option(this);
-    $('#WidgetOptions #WidgetOptionsDisplay').show();
-
-  };
 
   return this;
 };
 
 Carmen.Display.prototype = Object.create(Carmen.Widget.prototype);
 Carmen.Display.prototype.constructor = Carmen.Display;
+
+Carmen.Display.prototype.option = function() {
+    var WidgetGeneric = Object.getPrototypeOf(Object.getPrototypeOf(this));
+    WidgetGeneric.option(this);
+    $('#WidgetOptions #WidgetOptionsDisplay').show();
+};
+
 
 Carmen.Display.prototype.accept = function() {
 
