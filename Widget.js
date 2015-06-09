@@ -22,6 +22,8 @@ Carmen.Widget = function(scope) {
   // Visual properties, such as w/h (of content div), min dimensions, ...
   // Active (=polling data from scope) or suspended
   // Autoscale, manual scale
+  // Option: Set everything to default (like text size, color coding, etc.)
+  //         Widgets need to implement reset function
 
   this.name = function(_) {
     if (!arguments.length) return _name;
