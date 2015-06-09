@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Widgets</title>
+
+  <!-- Custom styles for this template -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/d3/d3.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="carmen.css">
+  <style>
+    .line {stroke: #000;}
+  </style>
+
+</head>
+<body>
+
+  <script>
+
+    var data = [
+
+      {t: 5, value: 1},
+      {t: 6, value: 2},
+      {t: 7, value: 4},
+      {t: 8, value: 8},
+      {t: 9, value: 16},
+      {t: 10, value: 8}
+
+    ];
+
+    var w = 800,
+  			h = 100,
+        x = d3.time.scale().range([0, w]);
+  	var xAxis;
+
+/*
+    var xAxis= d3.svg.axis().scale(x)
+  		.tickSize(-h)
+  		.tickFormat(d3.time.format("%H:%M"))
+  		.orient("bottom");
+*/
+var svg = d3.select("body").append("svg")
+  .attr("width", w)
+  .attr("height", h)
+  .attr("class", "graphchart")
+  ;
+
+  var cv = d3.select("body").append("canvas")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("class", "graphchart")
+    .node().getContext('2d')
+    ;
+
+  	svg.append("defs").append("clipPath")
+    	  .attr("id", "clip")
+    	;
+
+      var focus = svg.append("g")
+        		.attr("class", "focus")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")");
+
+  	// For each element ...
+
+  	var y;
+  	var yAxis;
+  	var line;
+  	var area;
+
+		y = d3.scale.linear().range([h, 0]);
+		yAxis = d3.svg.axis()
+	 		.scale(y)
+			.tickSize(w)
+			.orient("right")
+  			// .tickFormat(formatTemp)
+			;
+
+  		line = d3.svg.line()
+  			.x(function (d) {return x(d.t); })
+  			.y(function (d) {return y(d.value); })
+  			;
+  		focus.append("path")
+        .attr("class", "line")
+  			.datum(data)
+  //		.attr("d", value)
+  			;
+// -----------------------------------------------------
+
+		x.domain([0,20]);
+
+		y.domain(
+    							[d3.min(data.map(function(d) { return d.value; })),
+    							 d3.max(data.map(function(d) { return d.value; }))]
+					 );
+
+    function repaintSVG() {
+      focus.select(".line").attr("d", line(data));
+    }
+    repaintSVG();
+
+// -----------------------------------------------------
+
+  function repaintCV() {
+    cv.clearRect(0, 0, w, h);
+    var p = cv.beginPath();
+    var cx = 0;
+    var cy = 0;
+    var d = {};
+    d = data[0];
+    cx = x(d.t);
+    cy = y(d.value);
+    cv.moveTo(cx, cy);
+
+
+    for (i=1; i<data.length; i++) {
+      d = data[i];
+      cx = x(d.t);
+      cy = y(d.value);
+      cv.lineTo(cx,cy);
+      // console.log(data[i]);
+    }
+    cv.lineWidth = 1;
+    cv.strokeStyle = '#000000';
+    cv.stroke();
+
+  }
+  repaintCV();
+
+  </script>
+
+</body>
+</html>

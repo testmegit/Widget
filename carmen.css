@@ -1,0 +1,52 @@
+body {
+	margin-top: 60px;
+}
+.widget {
+
+}
+
+.widget.offline {
+	opacity: 0.5;
+}
+.widget.online {
+
+}
+
+rect {
+	stroke: #f00;
+	fill: #f00;
+}
+
+.barchart line {
+	stroke: #888;
+	opacity: 0.5;
+}
+path, area {
+	opacity: 0.5;
+}
+
+.graphchart path {
+	fill: none;
+	stroke-width: 1.5;
+}
+
+.widget .cog {
+	background: #FFF;
+	color: #767676;
+	position: absolute;
+	display: block;
+	z-index: 10;
+	top: -1px;
+	right: -1px;
+	padding: 5px 8px 5px 8px;
+	border: 1px solid #e1e1e8;
+	border-radius: 0 4px 0 4px;
+	opacity: 0.5;
+}
+
+.widget .cog:hover {
+	background: #563d7c;
+	border-color: #563d7c;
+	color: #FFF;
+	opacity: 1;
+}
