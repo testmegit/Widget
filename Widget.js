@@ -8,7 +8,8 @@ Carmen.Widget = function(scope) {
   var _name = 'MyName';
   var _scope = scope;
   var _elements = [];
-
+ 
+ 
   this.container = {};
   this.content = {};
   this.id = ++iid;
