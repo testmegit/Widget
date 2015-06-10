@@ -9,6 +9,9 @@ Carmen.Display = function(scope) {
   // Color coding, e.g. negative values in red or values > 100 km/h in blue ...
   // Text Size
 
+  var table = $('<table class="_table _table-condensed"><thead><tr><th>Name</th><th>Value</th></thead><tbody></tbody></table>');
+  $(this.content[0]).append(table);
+
   this.datasource = null;
 
   this.bind();
@@ -40,21 +43,23 @@ Carmen.Display.prototype.accept = function() {
 
 Carmen.Display.prototype.bind = function() {
   // this.datasource = d3.select(this.container[0]).selectAll('.element').data(this.elements());
-  var d = d3.select(this.content[0]).selectAll('.element').data(this.elements());
 
-	d.enter()
-		.append('div')
-		.attr('class', 'element')
-		.text(function(d) {
-			return d.name + ": ";
-		})
-		.append('span')
+  // var d = d3.select(this.content[0]).selectAll('.element').data(this.elements());
+  var d = d3.select(this.content[0]).select('tbody').selectAll('tr').data(this.elements());
+
+  var row = d.enter().append('tr').attr('class', 'element')
+  row.append('td')
+    .attr('class', 'name')
+    .text(function(d) {
+      return d.name + ": ";
+    });
+
+  row.append('td')
     .attr('class', 'value')
-    .attr('style', function(d) { return 'color: ' + d.color(); })
-		.text(function(d) {
-			return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
-		});
-
+    .attr('style', function(d) { return 'color: ' + d.color()})
+    .text(function(d) {
+      return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+    });
 };
 
 Carmen.Display.prototype.refresh = function() {

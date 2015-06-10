@@ -85,11 +85,14 @@ Carmen.Graph = function(scope) {
 
 	  _realtime = (_ === true);
 
+	  /* 
+	  // Might be necessary again, when the data update interval != GUI update interval
 	  if (_realtime) {
 	  	_refreshTimer = setInterval(this.refreshScale, 200, this);
 	  } else {
 	  	clearInterval(_refreshTimer);
 	  }
+	  */
 
 	  return this;
 	}; // realtime
@@ -170,8 +173,34 @@ Carmen.Graph.prototype.refresh = function() {
 			line = this.g.line
 			;
 
-	// canvas.clearRect(0, 0, w, h);
-	canvas.transform(0,0,0,0,-2,0);
+	var elements = this.elements();		// Convenience
+
+	canvas.clearRect(0, 0, w, h);
+	// canvas.transform(0,0,0,0,-2,0);
+
+	// Realtime shows a window of (default) 1 minute of data.
+	if (this.realtime()) {
+
+		x.domain([new Date().getTime() - 60000, new Date()]);	// 1 Minute Scope
+
+	} else {
+
+		// !realtime shows the whole data set.
+
+		// determine the first and last data point of all elements for correct scale
+		var tMins = [];
+		var tMaxs = [];
+		for (i = 0; i < elements.length; i++) {
+			tMins.push(elements[i].data[0].time);
+			tMaxs.push(elements[i].data[elements[i].data.length - 1].time);
+		}
+		var tMin = Math.min.apply(null, tMins);
+		var tMax = Math.max.apply(null, tMaxs);
+
+		x.domain([tMin, tMax]);
+
+	}	// realtime?
+
 
 	for (i = 0; i < this.elements().length; i++) {
 
@@ -179,13 +208,7 @@ Carmen.Graph.prototype.refresh = function() {
 	  var data = element.data;
 
 		var y = this.g.y[i];
-				// yAxis = this.g.yAxis[i];
-
-		if (!this.realtime()) {
-			// Todo: extent can be determined more efficiently
-			x.domain(d3.extent(data.map(function(d) { return d.time; })));
-		}
-
+		
 		// Todo: Min-Max values can be determined more efficiently!
 		if (this.autoscale()) {
 			y.domain(
@@ -196,39 +219,24 @@ Carmen.Graph.prototype.refresh = function() {
 			y.domain([element.definition.min,element.definition.max]);
 		}
 
-		// focus.select(".line." + element.key).attr("d", line[i](data));
-
-		// ----------------------------------------------------------------
-
 		canvas.beginPath();
 
-		d1 = data[data.length-2];
-		d0 = data[data.length-1];
+		// Move brush to first element
+		canvas.moveTo(x(data[0].time), y(data[0].value));
 
-		canvas.moveTo(799, y(d1.value));
-		canvas.lineTo(800, y(d0.value));
+		// Now paint the graph. 		
+		var d;
+		for (j=1; j<data.length; j++) {
+			d = data[j];
+			canvas.lineTo(x(d.time), y(d.value));
+		}
 
 		canvas.lineWidth = 1;
-		canvas.strokeStyle = element.color(); // '#000000';
+		canvas.strokeStyle = element.color() || '#000000';
 		canvas.stroke();
 
-	}
+	}	// for each element
 
-};
-
-Carmen.Graph.prototype.refreshScale = function(that) {
-/*
-	var t1 = new Date();
-	var t2 = new Date();
-	t1.setTime(t1.getTime()-(that.g.w * that.resolution()));
-	that.g.x.domain([t1, t2]);
-	for (i = 0; i < that.elements().length; i++) {
-		var element = that.elements()[i];
-		if (that.g.line[i] !== undefined) {
-			that.g.focus.select(".line."+element.key).attr("d", that.g.line[i](element.data));
-		}
-	}
-*/
 };
 
 Carmen.Graph.prototype.type = function(d) {
