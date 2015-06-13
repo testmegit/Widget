@@ -16,6 +16,7 @@ Carmen.Graph = function(scope) {
 	var _refreshTimer = {};
 	var _autoscale = false;
 	var _resolution = 1000;
+	var _hAxis = 20;
 
   that = Carmen.Widget.call(this, scope);
   this.version = '0.0.1';
@@ -29,11 +30,12 @@ Carmen.Graph = function(scope) {
 
 	var x = this.g.x = d3.time.scale().range([0, w]);
 
-/*	var xAxis = this.g.xAxis = d3.svg.axis().scale(x)
+	var xAxis = this.g.xAxis = d3.svg.axis().scale(x)
+		.ticks(9)
 		.tickSize(-h)
-		.tickFormat(d3.time.format("%H:%M"))
+		.tickFormat(d3.time.format("%H:%M:%S"))
 		.orient("bottom");
-*/
+
 	/*
 	var svg = this.g.svg = d3.select(this.content[0]).append("svg")
 		.attr("width", w)
@@ -44,6 +46,16 @@ Carmen.Graph = function(scope) {
   	  .attr("id", "clip")
   	;
 	*/
+
+	var svg = this.g.svg = d3.select(this.content[0]).append("svg:svg")
+		.attr("class", "graphaxis")
+		.attr("width", w)
+		.attr("height", h + _hAxis)
+		;
+	svg.append("g")
+				.attr("class", "axis x")
+				.attr("transform", "translate(0," + (h) + ")")
+				.call(xAxis);
 
 	var canvas = this.g.canvas = d3.select(this.content[0]).append("canvas")
 		.attr("width", w)
@@ -85,7 +97,7 @@ Carmen.Graph = function(scope) {
 
 	  _realtime = (_ === true);
 
-	  /* 
+	  /*
 	  // Might be necessary again, when the data update interval != GUI update interval
 	  if (_realtime) {
 	  	_refreshTimer = setInterval(this.refreshScale, 200, this);
@@ -158,6 +170,8 @@ Carmen.Graph.prototype.bind = function() {
 
 	} // for
 
+
+
 }; // bind
 
 Carmen.Graph.prototype.refresh = function() {
@@ -168,6 +182,7 @@ Carmen.Graph.prototype.refresh = function() {
 			xAxis = this.g.xAxis,
 			// focus = this.g.canvas,
 			canvas = this.g.canvas,
+			svg = this.g.svg,
 
 			area = this.g.area,
 			line = this.g.line
@@ -177,6 +192,8 @@ Carmen.Graph.prototype.refresh = function() {
 
 	canvas.clearRect(0, 0, w, h);
 	// canvas.transform(0,0,0,0,-2,0);
+
+
 
 	// Realtime shows a window of (default) 1 minute of data.
 	if (this.realtime()) {
@@ -201,6 +218,8 @@ Carmen.Graph.prototype.refresh = function() {
 
 	}	// realtime?
 
+	svg.select(".axis.x").call(xAxis);
+
 
 	for (i = 0; i < this.elements().length; i++) {
 
@@ -208,7 +227,7 @@ Carmen.Graph.prototype.refresh = function() {
 	  var data = element.data;
 
 		var y = this.g.y[i];
-		
+
 		// Todo: Min-Max values can be determined more efficiently!
 		if (this.autoscale()) {
 			y.domain(
@@ -224,7 +243,7 @@ Carmen.Graph.prototype.refresh = function() {
 		// Move brush to first element
 		canvas.moveTo(x(data[0].time), y(data[0].value));
 
-		// Now paint the graph. 		
+		// Now paint the graph.
 		var d;
 		for (j=1; j<data.length; j++) {
 			d = data[j];

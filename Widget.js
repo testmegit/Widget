@@ -8,8 +8,8 @@ Carmen.Widget = function(scope) {
   var _name = 'MyName';
   var _scope = scope;
   var _elements = [];
- 
- 
+
+
   this.container = {};
   this.content = {};
   this.id = ++iid;
@@ -42,10 +42,16 @@ Carmen.Widget = function(scope) {
     this.cog = $('<div style="position: relative"><div class="btn cog"><i class="fa fa-cog"></i></div></div>');
     this.cog.click(this, function (e) { e.data.option(); });
 
-    this.container = $('<div id="' + this.key + '" class="widget panel panel-default"></div>');
-    this.heading = $('<div class="name panel-heading panel-title">' + _name + '</div>');
-    this.content = $('<div class="content panel-body"></div>');
-    this.container.append(this.cog);
+    this.container = $('<div id="' + this.key + '" class="widget"></div>');
+    this.heading = $('<div class="name">' + _name + '</div>');
+    this.content = $('<div class="content"></div>');
+
+    // this.container = $('<div id="' + this.key + '" class="widget panel panel-default"></div>');
+    // this.heading = $('<div class="name panel-heading panel-title">' + _name + '</div>');
+    // this.content = $('<div class="content panel-body"></div>');
+
+    // this.container.append(this.cog);
+
     // this.container.append(this.heading);
     this.container.append(this.content);
     $('#engine').append(this.container);

@@ -75,6 +75,8 @@
   scope.connect();
 
   w1 = scope.widget.add(Carmen.Display).name('Oans');
+  w11 = scope.widget.add(Carmen.Display).name('Oans');
+
   w2 = scope.widget.add(Carmen.Bar).name('Zwoa');
 
   w3 = scope.widget.add(Carmen.Bar)
@@ -103,11 +105,12 @@
 
   // wg.realtime(true);
 
-  w1.element.add(e1);
-  w1.element.add(e2);
-  w1.element.add(e3);
-  w1.element.add(e4);
   w1.element.add(e5);
+
+  w11.element.add(e1);
+  w11.element.add(e2);
+  w11.element.add(e3);
+  w11.element.add(e4);
 
   w2.element.add(e1);
 

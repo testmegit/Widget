@@ -1,7 +1,18 @@
 body {
 	margin-top: 60px;
 }
+
+svg {
+  font: 10px sans-serif;
+}
+
 .widget {
+	/* display: inline; */
+	border: 1px solid #e1e1e8;
+	display: inline-block;
+	margin: 3px;
+	padding: 3px;
+	border-radius: 4px;
 
 }
 
@@ -23,6 +34,20 @@ rect {
 }
 path, area {
 	opacity: 0.5;
+}
+
+.graphaxis0 {
+	position: relative;
+	display: block;
+	top: 0;
+	z-index: 9;
+}
+
+.graphchart0 {
+	position: relative;
+	display: inline;
+	top: -120px;
+	z-index: 10;
 }
 
 .graphchart path {
@@ -49,4 +74,19 @@ path, area {
 	border-color: #563d7c;
 	color: #FFF;
 	opacity: 1;
+}
+
+.axis line {
+	stroke: #888;
+	stroke-width: 1px;
+	fill: none;
+	stroke-opacity: 0.5;
+	shape-rendering: crispEdges;
+	stroke-dasharray: 2,2;
+}
+
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
