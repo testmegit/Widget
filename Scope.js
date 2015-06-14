@@ -191,22 +191,37 @@ Carmen.Scope = function(host) {
   };
   this.widget.scope = this;
 
-  this.widget.add = function (Class) {
-    var w = new Class(this.scope);
+  this.widget.add = function (Class, container) {
+    var w = new Class(this.scope, container);
     _widgets.push(w);
     return w;
   };
 
+  /****************************** CONTAINERS ************************/
+
+  var _containers = [];
+  var _container = null;
+
+  var container;
+  this.container = function(_) {
+    if (!arguments.length) return this.container;
+    // if widget _ exists, return this widget.
+    if (arguments.length == 1) {
+      _container = Carmen.Container(_);
+    }
+    return _container;
+  };
+  this.container.scope = this;
+  this.container.add = function(widths) {
+    if (_container === null) { console.warn('Container is null. Adding Container to <body>.'); }
+    else {
+      return _container.add(widths);
+    }
+  };
+
+
   return this;
 
 }; /**  /scope  **/
-
-Carmen.Scope.prototype.constructor = Carmen.Scope;
-
-/***
-  *
-  * Widget.Scope.Element
-  *
-**/
 
 Carmen.Scope.prototype.constructor = Carmen.Scope;

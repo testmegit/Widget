@@ -1,6 +1,6 @@
-Carmen.Display = function(scope) {
+Carmen.Display = function(scope, container) {
 
-  that = Carmen.Widget.call(this, scope);
+  that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple numeric or text based display, showing the latest value.';
   this.decimals = 2;

@@ -1,6 +1,6 @@
-Carmen.Image = function(scope) {
+Carmen.Image = function(scope, container) {
 
-  that = Carmen.Widget.call(this, scope);
+  that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple image switcher, depending on a given value.';
 
@@ -46,7 +46,7 @@ Carmen.Image.prototype.bind = function(that) {
 		.append('img')
     .attr('class', 'value')
     .attr('style', function(d) { return 'color: ' + d.color(); })
-    .attr('src', 'img/offline.jpg') // Default jpg. Todo: Ajax loading gif? 
+    .attr('src', 'img/offline.jpg') // Default jpg. Todo: Ajax loading gif?
     ;
 
 };

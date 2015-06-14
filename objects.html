@@ -47,6 +47,7 @@
   <div class="container-fluid" id="signals"></div>
 
   <script src="Carmen.js"></script>
+  <script src="Layout.js"></script>
   <script src="Scope.js"></script>
   <script src="Element.js"></script>
   <script src="Widget.js"></script>
@@ -74,16 +75,22 @@
   scope.frequency(200);
   scope.connect();
 
-  w1 = scope.widget.add(Carmen.Display).name('Oans');
-  w11 = scope.widget.add(Carmen.Display).name('Oans');
+  // Set visual container.
+  scope.container($('#engine'));
+  var first = scope.container.add([6,6]);
+  var second = scope.container.add([2,2,8]);
+  var third = scope.container.add([5,5,2]);
 
-  w2 = scope.widget.add(Carmen.Bar).name('Zwoa');
+  w1 = scope.widget.add(Carmen.Display, first[0]).name('Oans');
+  w11 = scope.widget.add(Carmen.Display, first[1]).name('Oans');
 
-  w3 = scope.widget.add(Carmen.Bar)
+  w2 = scope.widget.add(Carmen.Bar, second[0]).name('Zwoa');
+
+  w3 = scope.widget.add(Carmen.Bar, second[1])
   					.name('Xuffa')
   					;
 
-  wg = scope.widget.add(Carmen.Graph)
+  wg = scope.widget.add(Carmen.Graph, second[2])
   				.name('Graf Zahl')
   				;
   wg.resolution(200);
@@ -120,8 +127,6 @@
   // var w1 = new Carmen.Widget(scope);
   // var w2 = new Carmen.Widget(scope);
   // var g = new Carmen.Graph(scope);
-
-
 
 
   </script>

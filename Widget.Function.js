@@ -1,6 +1,6 @@
-Carmen.Image = function(scope) {
+Carmen.Image = function(scope, container) {
 
-  that = Carmen.Widget.call(this, scope);
+  that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple image switcher, depending on a given value.';
 

@@ -1,6 +1,6 @@
-Carmen.Bar = function(scope) {
+Carmen.Bar = function(scope, container) {
 
-  that = Carmen.Widget.call(this, scope);
+  that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple Bargraph display, showing the latest value.';
   this.decimals = 2;
@@ -12,9 +12,9 @@ Carmen.Bar = function(scope) {
   // [x] Autoscale (y) based on min/max of elements
   // [ ] Element description
   // [ ] Current values
-  // [ ] History Min/Max as 
+  // [ ] History Min/Max as
 
-  var w = 10,
+  var w = 20,
       h = 100;
 
   var x = d3.scale.linear()
@@ -28,7 +28,7 @@ Carmen.Bar = function(scope) {
   var chart = d3.select(this.content[0])
     .append("svg:svg")
       .attr("class", "barchart")
-      .attr("width", w * this.elements().length)
+      .attr("width", 100)
       .attr("height", h);
 
   this.graphObject = {x: x, y: y, w: w, h: h, chart: chart};
@@ -45,7 +45,7 @@ Carmen.Bar.prototype.color = function(color) {
   // this.graphObject.chart.selectAll('rect').attr("style", "fill: " + color + "; stroke: " + color);
   // return this;
   return this;
-}
+};
 
 Carmen.Bar.prototype.accept = function() {
 
@@ -65,11 +65,14 @@ Carmen.Bar.prototype.bind = function() {
   var g = this.graphObject;
   var chart = g.chart;
 
+  g.x.domain([0, data.length])
+  .range([0, data.length*(g.w + 6)]);
+
   var rect = chart.selectAll("rect").data(data);
   var line = chart.selectAll("rect").data(data);
 
   // Resize in case of changes in data.length (more or fewer elements to display)
-  chart.attr("width", g.w * data.length);
+  chart.attr("width", (g.w + 6) * data.length);
 
   // Autoscale: Set Scale to (new) element range.
   var range = {min: 0, max: 0};
@@ -82,8 +85,8 @@ Carmen.Bar.prototype.bind = function() {
   // D3js Enter
   // Bar
   rect.enter().append("svg:rect")
-       .attr("x", function(d, i) { return g.x(i) - 0.5; })
-       .attr("y", function(d) { return g.h - g.y(d.data[d.data.length-1].value) - 0.5; })
+       .attr("x", function(d, i) { return g.x(i); })
+       .attr("y", function(d) { return g.h - g.y(d.data[d.data.length-1].value); })
 
        .attr("style", function(d) { return "fill: " + d.color() + "; stroke: " + d.color(); })
 

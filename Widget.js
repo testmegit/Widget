@@ -1,4 +1,4 @@
-Carmen.Widget = function(scope) {
+Carmen.Widget = function(scope, container) {
 
   if (scope === undefined) console.warn('Elements should not be instanciated outside a scope. Use myscope.element.add("reference") instead.');
 
@@ -10,7 +10,7 @@ Carmen.Widget = function(scope) {
   var _elements = [];
 
 
-  this.container = {};
+  this.container = container;
   this.content = {};
   this.id = ++iid;
   this.key = 'widget_' + this.id;
@@ -42,19 +42,28 @@ Carmen.Widget = function(scope) {
     this.cog = $('<div style="position: relative"><div class="btn cog"><i class="fa fa-cog"></i></div></div>');
     this.cog.click(this, function (e) { e.data.option(); });
 
+    /*
     this.container = $('<div id="' + this.key + '" class="widget"></div>');
     this.heading = $('<div class="name">' + _name + '</div>');
     this.content = $('<div class="content"></div>');
+    */
 
-    // this.container = $('<div id="' + this.key + '" class="widget panel panel-default"></div>');
-    // this.heading = $('<div class="name panel-heading panel-title">' + _name + '</div>');
-    // this.content = $('<div class="content panel-body"></div>');
+    if (this.container) {
+      this.container.empty();
+      this.container.addClass('widget');
+      this.container.attr('id', this.key);
+    } else {
+      this.container = $('<div id="' + this.key + '" class="widget panel panel-default"></div>');
+    }
+    this.heading = $('<div class="name panel-heading panel-title">' + _name + '</div>');
+    this.content = $('<div class="content panel-body"></div>');
 
-    // this.container.append(this.cog);
+    this.container.append(this.cog);
 
     // this.container.append(this.heading);
     this.container.append(this.content);
-    $('#engine').append(this.container);
+
+    // $('#engine').append(this.container);
 
   };
 

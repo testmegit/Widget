@@ -9,10 +9,10 @@ svg {
 .widget {
 	/* display: inline; */
 	border: 1px solid #e1e1e8;
-	display: inline-block;
 	margin: 3px;
 	padding: 3px;
 	border-radius: 4px;
+	height: auto;
 
 }
 

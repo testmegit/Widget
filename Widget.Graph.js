@@ -1,7 +1,7 @@
 // var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 // var parseDate = d3.time.format(".%S").parse;
 
-Carmen.Graph = function(scope) {
+Carmen.Graph = function(scope, container) {
 
 	// Todo
 	// [ ] Enhancement: Canvas statt SVG // Smooth scrolling ohne Neuzeichnen (CPU Load)
@@ -18,7 +18,7 @@ Carmen.Graph = function(scope) {
 	var _resolution = 1000;
 	var _hAxis = 20;
 
-  that = Carmen.Widget.call(this, scope);
+	that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple Graph display, showing the history of a value.';
   this.g = {};
