@@ -126,7 +126,8 @@ Carmen.Widget = function(scope, container) {
     if (_elements.indexOf(element) == -1) {
       _elements.push(element);
       // this.widget.container.append('<div></div>')
-      this.widget.bind(this.widget);
+      if (element.isInitialized()) this.widget.bind(this.widget);
+	  // -> bind is called by element when it is initialized
     } else {
       console.warn('Trying to add duplicate element to current widget (Action: skipped)!', element);
       return false;

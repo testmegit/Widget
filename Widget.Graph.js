@@ -54,12 +54,12 @@ Carmen.Graph = function(scope, container) {
 		;
 	svg.append("g")
 				.attr("class", "axis x")
-				.attr("transform", "translate(0," + (h) + ")")
+				.attr("transform", "translate(20," + (h) + ")")
 				.call(xAxis);
 
 	var canvas = this.g.canvas = d3.select(this.content[0]).append("canvas")
 		.attr("width", w)
-		.attr("height", h)
+		.attr("height", 100)
 		.attr("class", "graphchart")
 		.node().getContext('2d')
 		;
@@ -193,7 +193,11 @@ Carmen.Graph.prototype.refresh = function() {
 	canvas.clearRect(0, 0, w, h);
 	// canvas.transform(0,0,0,0,-2,0);
 
-
+	var startTime = this.scope().startTime()*1000;
+	var absTime = function( t)
+	{
+		return t/1000000 + startTime;// ns -> ms
+	};
 
 	// Realtime shows a window of (default) 1 minute of data.
 	if (this.realtime()) {
@@ -208,11 +212,14 @@ Carmen.Graph.prototype.refresh = function() {
 		var tMins = [];
 		var tMaxs = [];
 		for (i = 0; i < elements.length; i++) {
-			tMins.push(elements[i].data[0].time);
-			tMaxs.push(elements[i].data[elements[i].data.length - 1].time);
+			if (elements[i].data.length)
+			{
+				tMins.push(elements[i].data[0].time);
+				tMaxs.push(elements[i].data[elements[i].data.length - 1].time);
+			}
 		}
-		var tMin = Math.min.apply(null, tMins);
-		var tMax = Math.max.apply(null, tMaxs);
+		var tMin = absTime(Math.min.apply(null, tMins));		
+		var tMax = absTime(Math.max.apply(null, tMaxs));
 
 		x.domain([tMin, tMax]);
 
@@ -225,7 +232,8 @@ Carmen.Graph.prototype.refresh = function() {
 
 	  var element = this.elements()[i];
 	  var data = element.data;
-
+	  if (data.length)
+	  {
 		var y = this.g.y[i];
 
 		// Todo: Min-Max values can be determined more efficiently!
@@ -241,18 +249,19 @@ Carmen.Graph.prototype.refresh = function() {
 		canvas.beginPath();
 
 		// Move brush to first element
-		canvas.moveTo(x(data[0].time), y(data[0].value));
+		canvas.moveTo(x(absTime(data[0].time)), y(data[0].value));
 
 		// Now paint the graph.
 		var d;
 		for (j=1; j<data.length; j++) {
 			d = data[j];
-			canvas.lineTo(x(d.time), y(d.value));
+			canvas.lineTo(x(absTime(d.time)), y(d.value));
 		}
 
 		canvas.lineWidth = 1;
 		canvas.strokeStyle = element.color() || '#000000';
 		canvas.stroke();
+	 }
 
 	}	// for each element
 

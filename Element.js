@@ -1,4 +1,4 @@
-Carmen.Scope.Element = function(name, scope) {
+Carmen.Scope.Element = function(name,serializeString, scope) {
 
   // Todo
   // [ ] Element "Window", slicing the data
@@ -10,19 +10,71 @@ Carmen.Scope.Element = function(name, scope) {
   if (scope === undefined) console.warn('Elements should not be instanciated outside a scope. Use myscope.element.add("reference") instead.');
 
   var _color = "#FF0000";
+  
+  var _webSocketQuery=null;
+  function _createWebSocketQuery(element)
+  {
+	scope.webSocket().createQueryBySerializeString(this.scope.source(),element.serializeString,
+	function(query)
+	{
+		_webSocketQuery = query;
+		if (query.specification!==undefined)
+		{
+			element.definition.min = ("min" in query.specification)?query.specification.min:-Infinity;
+			element.definition.max = ("max" in query.specification)?query.specification.max:v;
+			element.unit = ("unit" in query.specification)?query.specification.unit:"";
+			element.definition.elementName = ("name" in query.specification)?query.specification.name:"";
+			element.definition.elementShortName = ("shortname" in query.specification)?query.specification.shortname:"";
+			element.name = element.definition.elementName.length?element.definition.elementName:element.definition.elementShortName;
+			if ("enums" in query.specification)
+			{
+				element.definition.datatype = Carmen.ElementDataType.Digital;
+				element.definition.enums = query.specification.enums;
+			}
+			else
+			{
+				element.definition.datatype = Carmen.ElementDataType.Analog;
+			}
+			
+		}
+		_webSocketQuery.values = element.data ;
+		
+		var widgets = element.widgets();
+		widgets.forEach(function(w)
+		{
+			var widgetElements = w.elements();
+			var test = true;
+			widgetElements.forEach(function(we)
+			{
+				if (!we.isInitialized())
+				{
+					test = false;
+				}
+			});
+			if (test) w.bind(w);
+		});
+	},
+	function error(error)
+	{
+  
+	});
+  };
 
   this.id = (++iid);
   this.key = "element_" + this.id;
-  this.name = name || 'MyElementName';
+  this.name = name||'MyElementName';
   this.active = true;
   this.scope = scope;
   this.hash = null;
-  this.unit = "km/h";
+  this.unit = "";
   this.i = 0;
+  this.serializeString = serializeString;
+
+
 
   this.definition = {};
   this.definition.datatype = Carmen.ElementDataType.Analog;
-  this.definition.min = -10;
+  this.definition.min = 0;
   this.definition.max = 10;
 
   // this.rule = {};
@@ -31,6 +83,23 @@ Carmen.Scope.Element = function(name, scope) {
   this.min = 0; // Infinity;
   this.max = 0; // -Infinity;
 
+  
+  this.init = function()
+  {
+	if (_webSocketQuery==undefined) _createWebSocketQuery(this);
+  }
+  this.isInitialized = function()
+  {
+	return _webSocketQuery!=null;
+  }
+
+  this.reset = function()
+  {
+    this.data.clear;
+	delete _webSocketQuery;
+	_webSocketQuery=null;
+  }
+  
   this.color = function(_) {
     if (!arguments.length) return _color;
     _color = _; return this;
@@ -38,7 +107,14 @@ Carmen.Scope.Element = function(name, scope) {
 
 
   // this.current will always be the latest value.
-  this.current = function() { return this.data[this.data.length-1]; };
+  this.current = function(){ 
+    return this.data.length?this.data[this.data.length-1]:null; 
+  };
+  this.currentValue = function(){
+	var val = this.current();
+	return val==null?0:val.value;	
+  }
+  
   this.data = [];
 
   var _widgets = [];

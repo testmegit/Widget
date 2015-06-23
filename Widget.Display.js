@@ -58,7 +58,14 @@ Carmen.Display.prototype.bind = function() {
     .attr('class', 'value')
     .attr('style', function(d) { return 'color: ' + d.color()})
     .text(function(d) {
-      return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+	  if (d.data.length)
+	  {
+		return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+	  }
+	  else
+	  {
+		return "-/- " + d.unit;
+	  }	  
     });
 };
 
@@ -67,7 +74,14 @@ Carmen.Display.prototype.refresh = function() {
   var d = d3.select(this.content[0]).selectAll('.element').data(this.elements());
 		d.selectAll('.value')
 		  .text(function(d) {
-		      return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+				if (d.data.length)
+				{		  
+				  return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+				}
+				else
+				{
+				   return "-/- " + d.unit;
+				}
 		    });
     d.exit().remove();
 

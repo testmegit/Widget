@@ -9,7 +9,11 @@
   <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
 
   <!-- Custom styles for this template -->
-  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <!-- <script src="bower_components/jquery/dist/jquery.js"></script> -->
+ <script src="js/jquery.js" type="text/javascript"></script>	
+<script src="js/jquery.json.js" type="text/javascript"></script>
+<script src="js/jquery.jsonrpcclient.js" type="text/javascript"></script>	
+ 
   <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script src="bower_components/d3/d3.js"></script>
 
@@ -46,6 +50,8 @@
   <div class="container-fluid" id="engine"></div>
   <div class="container-fluid" id="signals"></div>
 
+   <script src="CarmenWebsocket.js"></script> 
+  
   <script src="Carmen.js"></script>
   <script src="Layout.js"></script>
   <script src="Scope.js"></script>
@@ -58,11 +64,29 @@
 
   <script>
 
+  var serializeStringRPM = "00020000;02000000;MDAxMDAwMDA7MDAwMDY0MDEwMDAwMDEwMDAwMDBBNTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwOzAxMDBVQ3N3OzAxMDBVeXMwTUE9PQ=="
+  var serializeStringVel = "00020000;02000000;MDAxMDAwMDA7MDAwMDY0MDEwMDAwMDEwMDAwMDBDNTAyMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwOzAxMDBVQ3N3OzAxMDBVeXN4Tmc9PQ=="
+ 
 
-  var scope = new Carmen.Scope('localhost:1234');
-  var e1 = scope.element.add("First");
-  var e2 = scope.element.add("Second");
-  var e3 = scope.element.add("Third");
+  var scope = new Carmen.Scope('ws://127.0.0.1:8118', function(state)
+  {
+	if (state>0)
+	{	
+		$('.cmd-connect').hide();
+		$('.cmd-disconnect').show();
+	    console.log('Connected.');
+
+	}
+	else
+	{
+		$('.cmd-connect').show();
+		$('.cmd-disconnect').hide();
+	    console.log('Disconnected.');
+	}
+  });
+  var e1 = scope.element.add("first",serializeStringRPM);
+  var e2 = scope.element.add("second",serializeStringVel);
+/*  var e3 = scope.element.add("Third");
   var e4 = scope.element.add("Fourth");
   var e5 = scope.element.add("Fifth");
 
@@ -70,7 +94,7 @@
   e2.generator_load(80,200); // timespan (s), resolution(ms)
   e3.generator_load(80,200); // timespan (s), resolution(ms)
   e4.generator_load(80,200); // timespan (s), resolution(ms)
-  e5.generator_load(80,200); // timespan (s), resolution(ms)
+  e5.generator_load(80,200); // timespan (s), resolution(ms)*/
 
   scope.frequency(200);
   scope.connect();
@@ -97,9 +121,9 @@
 
   wg.element.add(e1);
   wg.element.add(e2);
-  wg.element.add(e3);
-  // wg.element.add(e4);
-  // wg.element.add(e5);
+/*  wg.element.add(e3);
+  wg.element.add(e4);
+  wg.element.add(e5);*/
 
 //  wi = scope.widget.add(Carmen.Image);
 //  wi.element.add(e1);
@@ -112,17 +136,17 @@
 
   // wg.realtime(true);
 
-  w1.element.add(e5);
+  //w1.element.add(e5);
 
   w11.element.add(e1);
   w11.element.add(e2);
-  w11.element.add(e3);
-  w11.element.add(e4);
+  //w11.element.add(e3);
+  //w11.element.add(e4);
 
   w2.element.add(e1);
 
   w3.element.add(e2);
-  w3.element.add(e3);
+  //w3.element.add(e3);
 
   // var w1 = new Carmen.Widget(scope);
   // var w2 = new Carmen.Widget(scope);

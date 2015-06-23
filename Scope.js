@@ -2,7 +2,7 @@ if (!Carmen) {
   throw new Error('Carmen.js has to be instanciated first!');
 }
 
-Carmen.Scope = function(host) {
+Carmen.Scope = function(host, callback) {
 
   if (arguments.length === 0)
     throw new Error('Provide Host String ("localhost:1234") for creating an instance of Scope');
@@ -18,7 +18,9 @@ Carmen.Scope = function(host) {
 
         _elements = [];
 
-
+	var _webSocket = new CarmenWebsocket(callback);
+	var _source = "{cb23844c-ccd1-426d-9828-ad17f1f67d78}";
+	
     // Create some properties to give an extension to the object's namespace.
     // e.g. myscope.element.add() --> see below!
     // Note the lower case, this is not the original class reference!
@@ -38,6 +40,8 @@ Carmen.Scope = function(host) {
     // Built-In data sources (Square, Triangle, Sinus, Noise)
     // Global Online/Offline Status
 
+ 
+	
   this.name = function(_) {
     if (!arguments.length) return _name;
     _name = _; return this;
@@ -58,6 +62,13 @@ Carmen.Scope = function(host) {
     return _online;
   };
 
+  this.source = function() {
+    if (arguments.length) throw new Error('Property source is readonly. Use connect() instead.');
+    return _source;
+  };
+  
+  
+
   this.colorscale = function(_) {
     return _colorscale(_);
   };
@@ -70,15 +81,22 @@ Carmen.Scope = function(host) {
 
   this.connect = function(callback) {
     console.log('Connecting...');
-    console.log('Connected.');
-    _online = true;
-
+	_webSocket.createConnection(host);
+    //console.log('Connected.');
+   _online = _webSocket.isConnected();
+ 
+   _elements.forEach(function(e) {
+     e.init();
+   });	
+ // _online = true;
+	
+	
     // Init Timer
     _timer = setInterval(this.heartbeat, _frequency);
     // .. and fire directly.
 
-    $('.cmd-connect').hide();
-    $('.cmd-disconnect').show();
+ //   $('.cmd-connect').hide();
+ //   $('.cmd-disconnect').show();
 
     this.heartbeat();
 
@@ -91,11 +109,22 @@ Carmen.Scope = function(host) {
 
     // Clear Timer
     clearInterval(_timer);
+	
+  _elements.forEach(function(e) {
+     e.reset();
+   });	
+	
+	if (_webSocket!==undefined)
+	{
+		_webSocket.closeConnection();
+	}
 
-    $('.cmd-connect').show();
-    $('.cmd-disconnect').hide();
+ /*	_online = false;*/
+	
+ //   $('.cmd-connect').show();
+ //   $('.cmd-disconnect').hide();
 
-    console.log('Disconnected.');
+ //   console.log('Disconnected.');
     _online = false;
     checkOnlineState();
     $('.cmd-online').removeClass('active');
@@ -103,6 +132,17 @@ Carmen.Scope = function(host) {
     return this;
   };
 
+  this.webSocket = function()
+  {
+    if (arguments.length) throw new Error('Property online is readonly. Use connect() instead.');
+    return _webSocket;
+  }
+  
+  this.startTime = function() {
+    if (arguments.length) throw new Error('Property startTime is readonly.');
+    return _webSocket!=null?_webSocket.startTime():0;
+  }; 
+  
   this.heartbeat = function() {
 
     // console.log('Heartbeat!');
@@ -111,7 +151,7 @@ Carmen.Scope = function(host) {
 
     checkOnlineState();
 
-    _elements.forEach(function(e) {
+  /*  _elements.forEach(function(e) {
 
       //var value = Math.max(-10, Math.min(10, (e.current()!==undefined ? e.current().value : 0) + 0.8 * Math.random() - 0.4 + 0.2 * Math.cos(e.i += 0.2)));
       var value = e.generator(); // this.SignalGenerator((e.current()!==undefined ? e.current().value : 0), e.i);
@@ -123,7 +163,7 @@ Carmen.Scope = function(host) {
       e.data.push(d);
       e.data.shift();
       // e.hash = Math.random();
-    });
+    });*/
 
     _widgets.forEach(function(w) {
       // w.bind();
@@ -151,10 +191,11 @@ Carmen.Scope = function(host) {
   };
   this.element.scope = this;
 
-  this.element.add = function(reference) {
-    var e = new Carmen.Scope.Element(reference, this.scope);
+  this.element.add = function(name, reference) {
+    var e = new Carmen.Scope.Element(name, reference, this.scope);
     e.color(this.scope.colorscale(e.id));
     _elements.push(e);
+	if (_webSocket.isConnected()) e.init();
     return e;
   };
 

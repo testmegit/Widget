@@ -69,7 +69,7 @@ Carmen.Bar.prototype.bind = function() {
   .range([0, data.length*(g.w + 6)]);
 
   var rect = chart.selectAll("rect").data(data);
-  var line = chart.selectAll("rect").data(data);
+  var line = chart.selectAll("line").data(data);
 
   // Resize in case of changes in data.length (more or fewer elements to display)
   chart.attr("width", (g.w + 6) * data.length);
@@ -86,12 +86,12 @@ Carmen.Bar.prototype.bind = function() {
   // Bar
   rect.enter().append("svg:rect")
        .attr("x", function(d, i) { return g.x(i); })
-       .attr("y", function(d) { return g.h - g.y(d.data[d.data.length-1].value); })
+       .attr("y", function(d) { return g.h - g.y(d.currentValue()); })
 
        .attr("style", function(d) { return "fill: " + d.color() + "; stroke: " + d.color(); })
 
        .attr("width", g.w)
-       .attr("height", function(d) { return g.y(d.data[d.data.length-1].value); });
+       .attr("height", function(d) { return g.y(d.currentValue()); });
 
   // "Whisker" (plotting the acutal max-value)
   line.enter().append("svg:line")
@@ -115,11 +115,16 @@ Carmen.Bar.prototype.refresh = function() {
 
   g.rect
     .transition().duration(200)
-    .attr("y", function(d) { return g.h - g.y(d.current().value) - 0.5; })
-    .attr("height", function(d) { return g.y(d.current().value); });
+    .attr("y", function(d) 
+	{ 
+	return g.h - g.y(d.currentValue()) - 0.5; 
+	})
+    .attr("height", function(d) { return g.y(d.currentValue()); });
 
   g.line
-       .attr("y1", function(d) { return g.h - g.y(d.max) - 0.5; })
+       .attr("y1", function(d) { 
+	   return g.h - g.y(d.max) - 0.5; 
+	   })
        .attr("y2", function(d) { return g.h - g.y(d.max) - 0.5; })
       ;
 
