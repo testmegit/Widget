@@ -74,9 +74,12 @@ Carmen.Scope = function(host, callback) {
   };
 
   var checkOnlineState = function() {
+	var running = _webSocket!=null?_webSocket.isRunning():false;
     _widgets.forEach(function(w) {
-      w.online(_online);
+      w.online(false);
     });
+	
+	return running;
   };
 
   this.connect = function(callback) {
@@ -149,7 +152,9 @@ Carmen.Scope = function(host, callback) {
 
     // Todo: Check online status, poll new data, etc.
 
-    checkOnlineState();
+	if (checkOnlineState())
+	{
+
 
   /*  _elements.forEach(function(e) {
 
@@ -165,11 +170,11 @@ Carmen.Scope = function(host, callback) {
       // e.hash = Math.random();
     });*/
 
-    _widgets.forEach(function(w) {
-      // w.bind();
-      w.refresh(w);
-    });
-
+		_widgets.forEach(function(w) {
+		  // w.bind();
+		  w.refresh(w);
+		});
+	}
   };
 
   /****************************** ELEMENTS ************************/

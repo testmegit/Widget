@@ -57,32 +57,47 @@ Carmen.Display.prototype.bind = function() {
   row.append('td')
     .attr('class', 'value')
     .attr('style', function(d) { return 'color: ' + d.color()})
-    .text(function(d) {
-	  if (d.data.length)
-	  {
-		return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
-	  }
-	  else
-	  {
-		return "-/- " + d.unit;
-	  }	  
-    });
+    .text(/*function(d) {
+		var current = d.current();
+		if (current!=null)
+		{
+			return (current.value).toFixed(2) + " " + d.unit;
+		}
+		else
+		{
+			return "-/- " + d.unit;
+		}	  
+    }/**/_display);
 };
 
 Carmen.Display.prototype.refresh = function() {
 
   var d = d3.select(this.content[0]).selectAll('.element').data(this.elements());
 		d.selectAll('.value')
-		  .text(function(d) {
-				if (d.data.length)
+		  .text(/*function(d) {
+				var current = d.current();
+				if (current!=null)
 				{		  
-				  return (d.data[d.data.length-1].value).toFixed(2) + " " + d.unit;
+				  return (current!=null.value).toFixed(2) + " " + d.unit;
 				}
 				else
 				{
 				   return "-/- " + d.unit;
 				}
-		    });
+		    }*/_display);
     d.exit().remove();
 
 };
+
+var _display = function (d)
+{
+	var current = d.current();
+	if (current!=null)
+	{		  
+	  return (current.value).toFixed(2) + " " + d.unit;
+	}
+	else
+	{
+	   return "-/- " + d.unit;
+	}
+}

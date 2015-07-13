@@ -8,6 +8,7 @@ Carmen.Widget = function(scope, container) {
   var _name = 'MyName';
   var _scope = scope;
   var _elements = [];
+  var _online = false;
 
 
   this.container = container;
@@ -75,20 +76,23 @@ Carmen.Widget = function(scope, container) {
 
   };
 
+  
   this.online = function(_) {
     if (!arguments.length) return _online;
 
-    _online = _;
+	if (_online!==_)
+	{
+		_online = _;
 
-    // Refresh GUI Object
-    if (_online) {
-      this.container.removeClass('offline');
-      this.container.addClass('online');
-    } else {
-      this.container.removeClass('online');
-      this.container.addClass('offline');
-    }
-
+		// Refresh GUI Object
+		if (_online) {
+		  this.container.removeClass('offline');
+		  this.container.addClass('online');
+		} else {
+		  this.container.removeClass('online');
+		  this.container.addClass('offline');
+		}
+	}
     return this;
 
   };
@@ -113,15 +117,15 @@ Carmen.Widget = function(scope, container) {
 
   this.element.add = function(element) {
 
-    // Add this widget to elements' list
-    element.widgets(this.widget);
-
-    // Check if Widget can display the element.
+	// Check if Widget can display the element.
     if (this.widget.accept().indexOf(element.definition.datatype) == -1) {
       console.error("Accepted data types: ", this.widget.accept());
       throw new Error("Cannot add this element due to its data type.");
     }
 
+    // Add this widget to elements' list
+    element.widgets(this.widget);
+	
     // Add element to this widget's list
     if (_elements.indexOf(element) == -1) {
       _elements.push(element);

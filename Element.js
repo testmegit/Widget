@@ -10,6 +10,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
   if (scope === undefined) console.warn('Elements should not be instanciated outside a scope. Use myscope.element.add("reference") instead.');
 
   var _color = "#FF0000";
+  var _timeSpan_ms = null;
   
   var _webSocketQuery=null;
   function _createWebSocketQuery(element)
@@ -21,7 +22,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 		if (query.specification!==undefined)
 		{
 			element.definition.min = ("min" in query.specification)?query.specification.min:-Infinity;
-			element.definition.max = ("max" in query.specification)?query.specification.max:v;
+			element.definition.max = ("max" in query.specification)?query.specification.max:Infinity;
 			element.unit = ("unit" in query.specification)?query.specification.unit:"";
 			element.definition.elementName = ("name" in query.specification)?query.specification.name:"";
 			element.definition.elementShortName = ("shortname" in query.specification)?query.specification.shortname:"";
@@ -36,8 +37,13 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 				element.definition.datatype = Carmen.ElementDataType.Analog;
 			}
 			
+			if (_timeSpan_ms!==null)
+			{
+				_webSocketQuery.setTimespan(_timeSpan_ms);
+			}
+			
 		}
-		_webSocketQuery.values = element.data ;
+		//_webSocketQuery.values = element.data ;
 		
 		var widgets = element.widgets();
 		widgets.forEach(function(w)
@@ -95,7 +101,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 
   this.reset = function()
   {
-    this.data.clear;
+    //this.data.clear;
 	delete _webSocketQuery;
 	_webSocketQuery=null;
   }
@@ -108,14 +114,27 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 
   // this.current will always be the latest value.
   this.current = function(){ 
-    return this.data.length?this.data[this.data.length-1]:null; 
+    //return this.data.length?this.data[this.data.length-1]:null; 
+	return _webSocketQuery!=null? _webSocketQuery.currentValue:null;
   };
   this.currentValue = function(){
 	var val = this.current();
 	return val==null?0:val.value;	
   }
   
-  this.data = [];
+  this.data = function(){ 
+    return _webSocketQuery!=null? _webSocketQuery.values:null; 
+  };
+  
+  this.setContinous = function(timespan_ms)
+  {
+		if (!arguments.length) return _timeSpan_ms;
+		_timeSpan_ms = timespan_ms; 
+		if (_webSocketQuery!=null)
+		{
+			_webSocketQuery.setTimespan(_timeSpan_ms);
+		}
+  }
 
   var _widgets = [];
   this.widgets = function(_) {
@@ -167,7 +186,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 
     var now = new Date();
 
-    for (i=0; i < seconds; i += (step_ms/1000)) {
+ /*   for (i=0; i < seconds; i += (step_ms/1000)) {
 
       var t = new Date().setTime(now.getTime() - (seconds*1000) + (i*1000));
       var d = {
@@ -175,7 +194,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
                 value: this.generator()
                 };
           this.data.push(d);
-    }
+    }*/
   };
 
   return this;

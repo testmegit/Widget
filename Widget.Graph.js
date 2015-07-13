@@ -12,7 +12,7 @@ Carmen.Graph = function(scope, container) {
 	// [ ]
 	// [ ]
 
-	var _realtime = false;
+	var _realtime = true;
 	var _refreshTimer = {};
 	var _autoscale = false;
 	var _resolution = 1000;
@@ -152,6 +152,8 @@ Carmen.Graph.prototype.bind = function() {
 
 		y[i] = this.g.y[i] = d3.scale.linear().range([h, 0]);
 
+		// we need continues data with 60s timeing window
+		data[i].setContinous(60000);
 /*
 		line[i] = this.g.line[i] = d3.svg.line()
 			.x(function (d) {return x(d.time); })
@@ -212,10 +214,11 @@ Carmen.Graph.prototype.refresh = function() {
 		var tMins = [];
 		var tMaxs = [];
 		for (i = 0; i < elements.length; i++) {
-			if (elements[i].data.length)
+			var data = elements[i].data();
+			if (data.length)
 			{
-				tMins.push(elements[i].data[0].time);
-				tMaxs.push(elements[i].data[elements[i].data.length - 1].time);
+				tMins.push(data[0].time);
+				tMaxs.push(data[data.length - 1].time);
 			}
 		}
 		var tMin = absTime(Math.min.apply(null, tMins));		
@@ -231,7 +234,7 @@ Carmen.Graph.prototype.refresh = function() {
 	for (i = 0; i < this.elements().length; i++) {
 
 	  var element = this.elements()[i];
-	  var data = element.data;
+	  var data = element.data();
 	  if (data.length)
 	  {
 		var y = this.g.y[i];
