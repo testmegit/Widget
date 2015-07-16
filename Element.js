@@ -92,7 +92,15 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
   
   this.init = function()
   {
-	if (_webSocketQuery==undefined) _createWebSocketQuery(this);
+	if (_webSocketQuery==undefined) 
+	{
+		console.log("Element.init ok");
+		_createWebSocketQuery(this);
+	}
+	else
+	{
+		console.log("Element.init fail");
+	}
   }
   this.isInitialized = function()
   {

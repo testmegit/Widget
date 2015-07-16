@@ -265,6 +265,10 @@ Carmen.Graph.prototype.refresh = function() {
 		canvas.strokeStyle = element.color() || '#000000';
 		canvas.stroke();
 	 }
+	 else
+	 {
+		console.log("data empty");
+	 }
 
 	}	// for each element
 

@@ -12,9 +12,10 @@ var CarmenWebsocket = function(callback) {
 
 //  var _connection=null; 
   
-  var _queries = Object.create( null ) ;
-  var _queryHandles =[];
+  //var _queries = Object.create( null ) ;
+  //var _queryHandles =[];
   var _listeners = Object.create( null ) ;
+  var _runningStateListener = null;
   
   var _timer = null;
   var  _frequency = 66;
@@ -130,9 +131,27 @@ var CarmenWebsocket = function(callback) {
 		}*/
 
 		_listeners = {};
-		_queries = {};
-		_queryHandles = [];
+		_runningStateListener = null;
+//		_queries = {};
+//		_queryHandles = [];
+		_delayedQueries = [];
 	};
+  
+ 	this.startMeasurement = function() {
+		if (arguments.length) throw new Error('Property startMeasurement is readonly.');
+		if (_ConnectionState>1) return;
+	
+		_notify('startMeasurement',[]);
+		return this;
+	};  
+  
+	this.stopMeasurement = function() {
+		if (arguments.length) throw new Error('Property stopMeasurement is readonly.');
+		if (_ConnectionState<2) return;
+	
+		_notify('stopMeasurement',[]);
+		return this;
+	};    
   
 	this.isRunning = function() {
 		if (arguments.length) throw new Error('Property isRunning is readonly.');
@@ -182,14 +201,19 @@ var CarmenWebsocket = function(callback) {
 	{
 		if (_ConnectionState==0)
 		{
+			console.log("createQueryBySerializeString -> (delayed)");
 			_delayedQueries.push(arguments);
 			return;
 		}
 
+		console.log("createQueryBySerializeString -> (normal)");
+
 		// 	_connection.call(
 		_request(
-		'createConnection', [source, [serializeString]],
-		function(result){
+//		'createListener', [source, [serializeString],{type: "interpreted"}],
+		'createListener', [source, [serializeString], "interpreted"],
+		function(result)
+		{
 		  if (result!==undefined && result.handle!=0)
 		  {
 			  var handle = result[0];
@@ -198,13 +222,14 @@ var CarmenWebsocket = function(callback) {
 			  {		
 				/*_connection.call*/_notify('setInterpreterSettings',[handle, defaultInterpretationSettings ]);
 				var query = new CarmenWebsocket.Query(handle);
-				//query.handle = handle;
 				query.serializeString = serializeString;
 				query.specification = specification; 
 				query.interpreterSettings = defaultInterpretationSettings;
+				_listeners[handle] = query;
+				callback(query);
 				//_queries[handle] = query;
 				//_queryHandles.push(handle);
-				_request('addListenerForInterpretedMessages',[handle,1],
+/*				_request('addListenerForInterpretedMessages',[handle,1],
 				function(listener)
 				{
 					if (listener!=0)
@@ -217,7 +242,7 @@ var CarmenWebsocket = function(callback) {
 				function(error)
 				{
 				
-				});
+				});*/
 			  }, 
 			  function(error)
 			  {
@@ -333,10 +358,10 @@ var CarmenWebsocket = function(callback) {
 			if (state==2)
 			{
 				// we are (re)starting, clear old data first
-				for (var query in  _queries)
+				/*for (var query in  _queries)
 				{
 					_queries[query].reset();
-				};		
+				};	*/	
 				for (var listener in  _listeners)
 				{
 					_listeners[listener].reset();
@@ -398,13 +423,13 @@ var CarmenWebsocket = function(callback) {
 	function _startupConnection()
 	{
 		_setConnectionState(1);
-		_request('addListenerForRunningState',[],
-			function(listener)
+		_request('activateListener',["runningstate", true ],
+			function( result)
 			{
-				if (listener!=0)
+				if (result!=undefined && result[0]===true)
 				{
-					var query = new CarmenWebsocket.Query(listener);
-					query.addValue = function(result)
+					_runningStateListener = new CarmenWebsocket.Query(0);
+					_runningStateListener.addValue = function(result)
 					{
 						try
 						{
@@ -425,9 +450,11 @@ var CarmenWebsocket = function(callback) {
 							console.log(err);
 						}
 					};
-					
-					_listeners[listener] = query;
-					_runningListener = query;
+				}
+				else
+				{
+					 console.log('installing startup listener failed: '+result[1]);
+					 self.closeConnection();
 				}
 			},
 			function(error)
@@ -560,17 +587,26 @@ var CarmenWebsocket = function(callback) {
 			  return;
 			}
 			// notification from server
-			else if ('method' in response && response.method==='onListener')
+			else if ('method' in response)
 			{
-				// listener 
-				response.params.forEach(function(result){
-				
-					var handle = result.listener;
-					if (result.listener in _listeners)
+				if (response.method==='interpreted')
+				{				
+					response.params.forEach(function(result){
+					
+						var handle = result.listener;
+						if (handle in _listeners)
+						{
+							_listeners[handle].addValues(result.data);
+						}
+					});
+				}
+				else if (response.method==='runningstate')
+				{
+					if (_runningStateListener!=null) 
 					{
-						_listeners[result.listener].addValues(result.data);
+						_runningStateListener.addValue(response.params);
 					}
-				});
+				}
 				return;
 			}
 			// If this is an object with error, it is an error response.

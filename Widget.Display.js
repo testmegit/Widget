@@ -1,9 +1,12 @@
 Carmen.Display = function(scope, container) {
 
+  var _lastValue;
+
   var that = Carmen.Widget.call(this, scope, container);
   this.version = '0.0.1';
   this.description = 'Simple numeric or text based display, showing the latest value.';
   this.decimals = 2;
+  
 
   // Todo
   // Color coding, e.g. negative values in red or values > 100 km/h in blue ...

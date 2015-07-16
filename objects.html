@@ -42,6 +42,8 @@
         <ul class="nav navbar-nav navbar-right">
           <li class="active cmd-disconnect" style="display: none"><a href="#" onclick="scope.disconnect(); return false;">Connected</a></li>
           <li class="cmd-connect"><a href="#" onclick="scope.connect(); return false;">Disconnected</a></li>
+		  <li class="active cmd-stopped" style="display: none"><a href="#" onclick="scope.stopMeasurement(); return false;">Running</a></li>
+          <li class="cmd-running"><a href="#" onclick="scope.startMeasurement(); return false;">Stopped</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -70,18 +72,30 @@
 
   var scope = new Carmen.Scope('ws://127.0.0.1:8118', function(state)
   {
-	if (state>0)
+	if (state==1)
 	{	
 		$('.cmd-connect').hide();
 		$('.cmd-disconnect').show();
+		$('.cmd-running').show();
+		$('.cmd-stopped').hide();
 	    console.log('Connected.');
 
 	}
-	else
+	else if (state==0)
 	{
 		$('.cmd-connect').show();
 		$('.cmd-disconnect').hide();
+		$('.cmd-running').show();
+		$('.cmd-stopped').hide();
 	    console.log('Disconnected.');
+	}
+	else if (state==2)
+	{
+		$('.cmd-connect').hide();
+		$('.cmd-disconnect').show();
+		$('.cmd-running').hide();
+		$('.cmd-stopped').show();
+	    console.log('Connected.');	
 	}
   });
   var e1 = scope.element.add("first",serializeStringRPM);

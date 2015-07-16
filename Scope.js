@@ -18,7 +18,43 @@ Carmen.Scope = function(host, callback) {
 
         _elements = [];
 
-	var _webSocket = new CarmenWebsocket(callback);
+	var _connetionStateCallback = callback;
+	var _callbackWebSocket = function( state)
+	{
+		if (state==0)
+		{
+			_disconnect();
+		}
+		
+		if (typeof(_connetionStateCallback) === "function" ) _connetionStateCallback(state);
+	};
+	var _webSocket = new CarmenWebsocket(_callbackWebSocket);
+
+	
+	var _disconnect = function()
+	{
+		console.log('Disconnecting...');
+
+		// Clear Timer
+		if (_timer != undefined)
+		{
+			clearInterval(_timer);
+		}
+		
+		_elements.forEach(function(e) {
+			e.reset();
+		});	
+		
+		if (_webSocket!=undefined)
+		{
+			_webSocket.closeConnection();
+		}
+
+		_online = false;
+		checkOnlineState();
+		$('.cmd-online').removeClass('active');
+	}
+	
 	var _source = "{cb23844c-ccd1-426d-9828-ad17f1f67d78}";
 	
     // Create some properties to give an extension to the object's namespace.
@@ -108,29 +144,8 @@ Carmen.Scope = function(host, callback) {
   };
 
   this.disconnect = function(callback) {
-    console.log('Disconnecting...');
-
-    // Clear Timer
-    clearInterval(_timer);
+	_disconnect();
 	
-  _elements.forEach(function(e) {
-     e.reset();
-   });	
-	
-	if (_webSocket!==undefined)
-	{
-		_webSocket.closeConnection();
-	}
-
- /*	_online = false;*/
-	
- //   $('.cmd-connect').show();
- //   $('.cmd-disconnect').hide();
-
- //   console.log('Disconnected.');
-    _online = false;
-    checkOnlineState();
-    $('.cmd-online').removeClass('active');
     if ((arguments.length) & (typeof(callback) === "function")) callback(this);
     return this;
   };
@@ -145,6 +160,25 @@ Carmen.Scope = function(host, callback) {
     if (arguments.length) throw new Error('Property startTime is readonly.');
     return _webSocket!=null?_webSocket.startTime():0;
   }; 
+  
+	this.startMeasurement = function() {
+		if (arguments.length) throw new Error('Property startMeasurement is readonly.');
+		if (_webSocket==null)
+		{
+			this.connect();
+		}
+		_webSocket.startMeasurement();
+		return this;
+	};  
+  
+	this.stopMeasurement = function() {
+		if (arguments.length) throw new Error('Property stopMeasurement is readonly.');
+		if (_webSocket!=null)
+		{
+			_webSocket.stopMeasurement();
+		}
+	   return this;
+	};   
   
   this.heartbeat = function() {
 
