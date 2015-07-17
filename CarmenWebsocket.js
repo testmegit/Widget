@@ -35,7 +35,8 @@ var CarmenWebsocket = function(callback) {
 	"showUnit": false,
 	"useAbsoluteTime": false,
 	"useShortNames": true,
-	"useTopedSettings": false};
+	"useTopedSettings": false,
+	"policy": "currentChanged"};
 	
 	// current connection state (0: not connected, 1: connected, 2: measurement is running)
 	var _ConnectionState = 0;
@@ -220,8 +221,11 @@ var CarmenWebsocket = function(callback) {
 			  /*_connection.call*/_request('getElementInstanceSpecification',[serializeString],
 			  function(specification)
 			  {		
-				/*_connection.call*/_notify('setInterpreterSettings',[handle, defaultInterpretationSettings ]);
-				var query = new CarmenWebsocket.Query(handle);
+				_request('setInterpreterSettings',[handle, defaultInterpretationSettings ],	function(result)
+				{
+					query.interpreterSettings = result;
+				});
+				var query = new CarmenWebsocket.Query(handle, self);
 				query.serializeString = serializeString;
 				query.specification = specification; 
 				query.interpreterSettings = defaultInterpretationSettings;
@@ -337,17 +341,30 @@ var CarmenWebsocket = function(callback) {
 			throw new Error("Invalid query!");
 		}	
 
-		var s = defaultInterpretationSettings;
+		var s = Object.create( null );
+		var len = 0;
 		// only transfer valid properties
-		for ( var name in s )
+		for ( var name in defaultInterpretationSettings )
 		{
-			if (settings[name]!==undefined && typeof(settings[name])== typeof(s[name]))
+			if (settings[name]!==undefined && typeof(settings[name])== typeof(defaultInterpretationSettings[name]))
 			{
-				s = settings[name];
+				// only settings which are changing
+				if (query.interpreterSettings[name]==undefined || query.interpreterSettings[name]!== settings[name])
+				{
+					s[name] = settings[name];
+					len++;
+				}
 			}
 		}
 
-		/*_connection.call*/_request('setInterpreterSettings',[handle, s ]);
+		if (len)
+		{
+			_request('setInterpreterSettings',[query.handle, s ],
+			function(result)
+			{
+				query.interpreterSettings = result;
+			});
+		}
 	} 
   
   
@@ -687,9 +704,10 @@ var CarmenWebsocket = function(callback) {
 //CarmenWebsocket.prototype.constructor = CarmenWebsocket;
 
 
-CarmenWebsocket.Query = function(handle, timeSpan_ms)
+CarmenWebsocket.Query = function(handle, webSocket, timeSpan_ms)
 {
 	this.handle = handle;
+	this.webSocket = webSocket;
 	this.currentValue = null;
 	if(timeSpan_ms==undefined || timeSpan_ms<=0)
 	{
@@ -768,9 +786,20 @@ CarmenWebsocket.Query.prototype.reset = function()
 	}
 }*/
 
-CarmenWebsocket.Query.prototype.setTimespan = function (timespan_ms)
+CarmenWebsocket.Query.prototype.setContinous = function (timespan_ms)
 {
-	if (timespan_ms>0)
+	if (this.interpreterSettings["policy"]!=="recent")
+	{
+		this.webSocket.setInterpreterSettings(this, {"policy": "recent"});
+	}
+	
+	var timespan = (timespan_ms!==undefined && timespan_ms>0)?timespan_ms*1000000:60000000000; // ms -> ns
+	if (this.values==null) this.values = [];
+	if (this.timeSpan<timespan)
+	{
+		this.timeSpan = timespan;
+	}	
+/*	if (timespan_ms>0)
 	{
 		if (this.values==null) this.values = [];
 		var timespan = timespan_ms*1000000; // ms -> ns
@@ -778,5 +807,5 @@ CarmenWebsocket.Query.prototype.setTimespan = function (timespan_ms)
 		{
 			this.timeSpan = timespan;
 		}
-	}
+	}*/
 }

@@ -68,7 +68,7 @@
 
   var serializeStringRPM = "00020000;02000000;MDAxMDAwMDA7MDAwMDY0MDEwMDAwMDEwMDAwMDBBNTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwOzAxMDBVQ3N3OzAxMDBVeXMwTUE9PQ=="
   var serializeStringVel = "00020000;02000000;MDAxMDAwMDA7MDAwMDY0MDEwMDAwMDEwMDAwMDBDNTAyMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwOzAxMDBVQ3N3OzAxMDBVeXN4Tmc9PQ=="
- 
+  var serializeStringTorque = "00020000;02000000;MDAxMDAwMDA7MDAwMDY0MDEwMDAwMDEwMDAwMDBBNTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwOzAxMDBVQ3N3OzAxMDBVeXN4Tmc9PQ==";
 
   var scope = new Carmen.Scope('ws://127.0.0.1:8118', function(state)
   {
@@ -98,10 +98,10 @@
 	    console.log('Connected.');	
 	}
   });
-  var e1 = scope.element.add("first",serializeStringRPM);
-  var e2 = scope.element.add("second",serializeStringVel);
-/*  var e3 = scope.element.add("Third");
-  var e4 = scope.element.add("Fourth");
+  var e2 = scope.element.add("first",serializeStringTorque);
+  var e3 = scope.element.add("second",serializeStringVel);
+  var e1 = scope.element.add("Third", serializeStringRPM);
+/*  var e4 = scope.element.add("Fourth");
   var e5 = scope.element.add("Fifth");
 
   e1.generator_load(80,200); // timespan (s), resolution(ms)
@@ -135,7 +135,10 @@
 
   wg.element.add(e1);
   wg.element.add(e2);
-/*  wg.element.add(e3);
+	
+  w1.element.add(e3);
+ 
+ /*  wg.element.add(e3);
   wg.element.add(e4);
   wg.element.add(e5);*/
 

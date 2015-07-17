@@ -39,7 +39,7 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
 			
 			if (_timeSpan_ms!==null)
 			{
-				_webSocketQuery.setTimespan(_timeSpan_ms);
+				_webSocketQuery.setContinous(_timeSpan_ms);
 			}
 			
 		}
@@ -134,15 +134,15 @@ Carmen.Scope.Element = function(name,serializeString, scope) {
     return _webSocketQuery!=null? _webSocketQuery.values:null; 
   };
   
-  this.setContinous = function(timespan_ms)
-  {
+	this.setContinous = function(timespan_ms)
+	{
 		if (!arguments.length) return _timeSpan_ms;
 		_timeSpan_ms = timespan_ms; 
 		if (_webSocketQuery!=null)
 		{
-			_webSocketQuery.setTimespan(_timeSpan_ms);
+			_webSocketQuery.setContinous(_timeSpan_ms);
 		}
-  }
+	}
 
   var _widgets = [];
   this.widgets = function(_) {
